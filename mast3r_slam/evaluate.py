@@ -12,9 +12,13 @@ from plyfile import PlyData, PlyElement
 
 
 def prepare_savedir(args, dataset):
-    save_dir = pathlib.Path("logs")
-    if args.save_as != "default":
-        save_dir = save_dir / args.save_as
+    if args.save_as == "output":
+        # For Docker workflow, save directly to output/ directory
+        save_dir = pathlib.Path("output")
+    else:
+        save_dir = pathlib.Path("logs")
+        if args.save_as != "default":
+            save_dir = save_dir / args.save_as
     save_dir.mkdir(exist_ok=True, parents=True)
     seq_name = dataset.dataset_path.stem
     return save_dir, seq_name
@@ -83,6 +87,30 @@ def save_keyframes(savedir, timestamps, keyframes: SharedKeyframes):
                 (keyframe.uimg.cpu().numpy() * 255).astype(np.uint8), cv2.COLOR_RGB2BGR
             ),
         )
+
+
+def save_intrinsics(savedir, filename, keyframes: SharedKeyframes):
+    """Save camera intrinsics matrix to a text file."""
+    savedir = pathlib.Path(savedir)
+    savedir.mkdir(exist_ok=True, parents=True)
+    
+    # Get intrinsics from keyframes
+    if config["use_calib"] and hasattr(keyframes, 'K'):
+        K = keyframes.get_intrinsics().cpu().numpy()
+        filepath = savedir / filename
+        
+        # Save as 3x3 matrix
+        np.savetxt(filepath, K, fmt='%.6f', header='Camera intrinsics matrix K (3x3)')
+        
+        # Also save in a more descriptive format
+        with open(str(filepath).replace('.txt', '_info.txt'), 'w') as f:
+            f.write("# Camera intrinsics information\n")
+            f.write(f"# Image size: {keyframes.img_shape.flatten()[:2].tolist()}\n")
+            f.write(f"fx: {K[0, 0]:.6f}\n")
+            f.write(f"fy: {K[1, 1]:.6f}\n")
+            f.write(f"cx: {K[0, 2]:.6f}\n")
+            f.write(f"cy: {K[1, 2]:.6f}\n")
+            f.write(f"skew: {K[0, 1]:.6f}\n")
 
 
 def save_ply(filename, points, colors):

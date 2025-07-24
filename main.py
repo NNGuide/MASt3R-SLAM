@@ -321,6 +321,9 @@ if __name__ == "__main__":
         eval.save_keyframes(
             save_dir / "keyframes" / seq_name, dataset.timestamps, keyframes
         )
+        # Save camera intrinsics if available
+        if config["use_calib"]:
+            eval.save_intrinsics(save_dir, f"{seq_name}_intrinsics.txt", keyframes)
     if save_frames:
         savedir = pathlib.Path(f"logs/frames/{datetime_now}")
         savedir.mkdir(exist_ok=True, parents=True)
