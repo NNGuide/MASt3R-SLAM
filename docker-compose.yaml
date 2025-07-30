@@ -12,6 +12,7 @@ services:
       - ./scripts:/app/scripts
       - ./checkpoints:/app/checkpoints
       - ./config:/app/config
+      - /tmp/.X11-unix:/tmp/.X11-unix
     deploy:
       resources:
         reservations:
@@ -19,3 +20,8 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
+    environment:
+      - DISPLAY=${DISPLAY} # Pass the host's display to the container
+      - NVIDIA_VISIBLE_DEVICES=all # Make all GPUs visible to the container
+    ipc: host
+    network_mode: host # Use host network mode for X11 forwarding

@@ -56,7 +56,7 @@ RUN conda create -n mast3r-slam python=3.11 -y
 RUN conda run -n mast3r-slam conda install pytorch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 pytorch-cuda=12.1 -c pytorch -c nvidia -y
 
 # Clone the repository
-RUN git clone --recursive https://github.com/rmurai0610/MASt3R-SLAM.git /app
+RUN git clone --recursive -b feature/docker https://github.com/NNGuide/MASt3R-SLAM.git /app
 WORKDIR /app
 
 # Set environment variables for compiling CUDA extensions
