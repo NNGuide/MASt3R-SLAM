@@ -76,7 +76,7 @@ def save_keyframes(savedir, timestamps, keyframes: SharedKeyframes):
     for i in range(len(keyframes)):
         keyframe = keyframes[i]
         t = timestamps[keyframe.frame_id]
-        filename = savedir / f"{t}.png"
+        filename = savedir / f"{keyframe.frame_id}.png"
         cv2.imwrite(
             str(filename),
             cv2.cvtColor(
