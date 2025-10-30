@@ -75,6 +75,23 @@ def save_keyframes(savedir, timestamps, keyframes: SharedKeyframes):
     savedir.mkdir(exist_ok=True, parents=True)
     for i in range(len(keyframes)):
         keyframe = keyframes[i]
+
+        # Get the 3D point cloud of the current keyframe
+        point_map = keyframe.X_canon.cpu().numpy().astype(np.float32)
+
+        # Extrat depth map
+        depth_map = point_map[:, 2:3]
+
+        # Get the shape of the depth map based on the keyframe image shape
+        depth_shape = keyframe.img_shape.detach().cpu().numpy()
+        depth_img = depth_map.reshape((depth_shape[0][0], depth_shape[0][1]))
+
+        # Set the directory to save the depth map
+        depth_filename = savedir / f"{keyframe.frame_id}_depth.npy"
+
+        # Save depth map as .npy file
+        np.save(depth_filename, depth_img)
+
         t = timestamps[keyframe.frame_id]
         filename = savedir / f"{keyframe.frame_id}.png"
         cv2.imwrite(
