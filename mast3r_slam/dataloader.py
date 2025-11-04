@@ -1,6 +1,7 @@
 import pathlib
 import re
 import cv2
+import itertools
 from natsort import natsorted
 import numpy as np
 import torch
@@ -270,7 +271,11 @@ class RGBFiles(MonocularDataset):
         super().__init__()
         self.use_calibration = False
         self.dataset_path = pathlib.Path(dataset_path)
-        self.rgb_files = natsorted(list((self.dataset_path).glob("*.jpg")))
+
+        # Add support for importing both .jpg and .png files
+        patterns = ["*.jpg", "*.png"]
+        all_files = itertools.chain.from_iterable((self.dataset_path).glob(p) for p in patterns)
+        self.rgb_files = natsorted(list(all_files))
         self.timestamps = np.arange(0, len(self.rgb_files)).astype(self.dtype) / 30.0
 
 
