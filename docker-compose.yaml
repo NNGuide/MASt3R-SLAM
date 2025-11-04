@@ -7,7 +7,7 @@ services:
     tty: true # Allocate a pseudo-TTY (required for an interactive shell)
     shm_size: '2gb'  # Increase shared memory size for multiprocessing
     volumes:
-      - ./data:/app/data
+      - /fdata2/nati_n/master-slam/workspace:/data
       - ./output:/app/output
       - ./scripts:/app/scripts
       - ./checkpoints:/app/checkpoints
@@ -18,7 +18,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              count: all
               capabilities: [ gpu ]
     environment:
       - DISPLAY=${DISPLAY} # Pass the host's display to the container
